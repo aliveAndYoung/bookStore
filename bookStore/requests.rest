@@ -1,0 +1,175 @@
+@baseUrl = http://localhost:3000/api
+
+### 1. Register a new user (Admin)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Admin User",
+  "email": "admin@example.com",
+  "password": "123456",
+  "role": "admin"
+}
+
+### 2. Register a regular user
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Regular User",
+  "email": "user@example.com",
+  "password": "123456",
+  "role": "user"
+}
+
+### 3. Login as admin
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "123456"
+}
+
+### 4. Login as regular user
+# @name userLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "123456"
+}
+
+### 5. Get current logged in user (Admin)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{adminLogin.response.body.token}}
+
+### 6. Get current logged in user (Regular User)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{userLogin.response.body.token}}
+
+### 7. Create a new book (Admin)
+# @name createBook
+POST {{baseUrl}}/books
+Authorization: Bearer {{adminLogin.response.body.token}}
+Content-Type: application/json
+
+{
+  "title": "harry potter",
+  "author": "j.k rowlling",
+  "price": 15.3,
+  "ISBN": "6513265321",
+  "publishedDate": "1925-04-10",
+  "genre": "Other"
+}
+
+### 8. Try to create a book as regular user (Should fail)
+POST {{baseUrl}}/books
+Authorization: Bearer {{userLogin.response.body.token}}
+Content-Type: application/json
+
+{
+  "title": "Unauthorized Book",
+  "author": "Regular User",
+  "price": 9.99,
+  "ISBN": "9780000000000",
+  "publishedDate": "2023-01-01",
+  "genre": "Fiction"
+}
+
+### 9. Get all books
+GET {{baseUrl}}/books
+
+### 10. Get single book
+GET {{baseUrl}}/books/{{createBook.response.body.data._id}}
+
+### 11. Update book (Admin)
+PUT {{baseUrl}}/books/{{createBook.response.body.data._id}}
+Authorization: Bearer {{adminLogin.response.body.token}}
+Content-Type: application/json
+
+{
+  "price": 14.99,
+  "title": "The Great Gatsby (Special Edition)"
+}
+
+### 12. Try to update book as regular user (Should fail)
+PUT {{baseUrl}}/books/{{createBook.response.body.data._id}}
+Authorization: Bearer {{userLogin.response.body.token}}
+Content-Type: application/json
+
+{
+  "price": 1.99
+}
+
+### 13. Create another book (Admin)
+# @name createSecondBook
+POST {{baseUrl}}/books
+Authorization: Bearer {{adminLogin.response.body.token}}
+Content-Type: application/json
+
+{
+  "title": "To Kill a Mockingbird",
+  "author": "Harper Lee",
+  "price": 10.99,
+  "ISBN": "9780061120084",
+  "publishedDate": "1960-07-11",
+  "genre": "Fiction"
+}
+
+### 14. Get all books again to see both books
+GET {{baseUrl}}/books
+
+### 15. Try to delete book as regular user (Should fail)
+DELETE {{baseUrl}}/books/{{createBook.response.body.data._id}}
+Authorization: Bearer {{userLogin.response.body.token}}
+
+### 16. Delete book (Admin)
+DELETE {{baseUrl}}/books/{{createBook.response.body.data._id}}
+Authorization: Bearer {{adminLogin.response.body.token}}
+
+### 17. Verify book was deleted
+GET {{baseUrl}}/books/{{createBook.response.body.data._id}}
+
+### 18. Get all books to see remaining book
+GET {{baseUrl}}/books
+
+### 19. Test validation - Create book with missing fields (Should fail)
+POST {{baseUrl}}/books
+Authorization: Bearer {{adminLogin.response.body.token}}
+Content-Type: application/json
+
+{
+  "title": "Incomplete Book",
+  "price": 9.99
+}
+
+### 20. Test validation - Create book with invalid data (Should fail)
+POST {{baseUrl}}/books
+Authorization: Bearer {{adminLogin.response.body.token}}
+Content-Type: application/json
+
+{
+  "title": "Bad Book",
+  "author": "A",
+  "price": -5,
+  "ISBN": "123",
+  "publishedDate": "not-a-date",
+  "genre": "NotAGenre"
+}
+
+### 21. Test duplicate ISBN (Should fail)
+POST {{baseUrl}}/books
+Authorization: Bearer {{adminLogin.response.body.token}}
+Content-Type: application/json
+
+{
+  "title": "Duplicate ISBN",
+  "author": "Test Author",
+  "price": 9.99,
+  "ISBN": "9780061120084",
+  "publishedDate": "2023-01-01",
+  "genre": "Fiction"
+}
