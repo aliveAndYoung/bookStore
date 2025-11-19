@@ -1,17 +1,18 @@
 import express from "express";
+import { get } from "mongoose";
+import {
+    deleteNotes,
+    getNoteById,
+    getNotes,
+    postNotes,
+    updateNotes,
+} from "../Controllers/notesController.js";
 const noteRouter = express.Router();
 
-noteRouter.get("/", (req, res) => {
-    res.status(200).send("Hello, World!");
-});
-noteRouter.post("/", (req, res) => {
-    res.status(201).send("Note Created");
-});
-noteRouter.post("/:id", (req, res) => {
-    res.status(201).send("Note Updated");
-});
-noteRouter.delete("/:id", (req, res) => {
-    res.status(201).send("Note Deleted");
-});
+noteRouter.get("/", getNotes);
+noteRouter.get("/:id", getNoteById);
+noteRouter.post("/", postNotes);
+noteRouter.post("/:id", updateNotes);
+noteRouter.delete("/:id", deleteNotes);
 
 export default noteRouter;

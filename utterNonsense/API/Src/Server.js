@@ -7,6 +7,7 @@ dotenv.config({ quiet: true });
 const app = express();
 const port = process.env.PORT || 5000;
 
+app.use(express.json());
 connectDb();
 app.use("/api/notes", notesRoutes);
 
